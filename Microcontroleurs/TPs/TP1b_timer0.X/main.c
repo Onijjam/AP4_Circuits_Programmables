@@ -24,6 +24,9 @@ void delai_approx(void) {
 void main(void) {
     /* Code d'initialisation */
     /*Mise en Output des LEDS*/
+    OPTION_REG &= ~(0x28);
+    OPTION_REG |= 0x05;
+    
     TRISD &= 0xF0;
     TRISB &= 0xF0;
     /*On allume de D1 à D4 de manière individuel et on éteins de D5 à D8 | On initialise le cas zero*/
@@ -39,4 +42,3 @@ void main(void) {
         LATB ^= (1 << 3) + (1 << 2) + (1 << 1) + 1;
     }
 }
-

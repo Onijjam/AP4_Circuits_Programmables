@@ -12,8 +12,8 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>../Ressources/template.c</itemPath>
-      <itemPath>../Ressources/configbits.h</itemPath>
+      <itemPath>main.c</itemPath>
+      <itemPath>configbits.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -24,6 +24,7 @@
   <sourceRootList>
     <Elem>../../../../Users/gautm/Downloads/code_tp1</Elem>
     <Elem>../Ressources</Elem>
+    <Elem>.</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>

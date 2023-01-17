@@ -12,21 +12,93 @@
  * D8 <=> PORTB3
  */
 
-/*Permet de répéter une action pour simuler une attente (peu précis mais universel)*/
-void delai_approx(void) {
-    /*Doit faire 125 cycle pour avoir 0.5s car il en faut 250 pour faire une 1s avec 32 de prescaler*/
-    for(int i=0; i<125; i++){
-        /*On met bien TMR0IF à 0*/
-        PIR1 &= ~0x02;
-        /*On lit le bit de TMR0IF pour savoir quand il a fait un cyle (doit être à 1)*/
-        while(!(PIR1 & 0x02)){
-            
+int time_ms = 0;
+
+void __interrupt() isr (void){
+    PIR1 &= ~(0x02);
+    time_ms++;
+    if(time_ms == 125){
+        char b = (LATB & 0x0F);
+        char d = (LATD & 0x0F);
+        int count = 0;
+        char verif = 'b';
+        char choice = b;
+
+        if(b == 0x00){
+            verif = 'd';
+            choice = d;
         }
-    }
+
+        switch( choice )
+        {
+            case 0x01:
+                    count=1;
+                    break;
+            case 0x02:
+                    count=2;
+                    break;
+            case 0x04:
+                    count=3;
+                    break;
+            case 0x08:
+                    count=4;
+                    break;
+            default:
+                    count=0;
+                    break;
+        }
+
+        if(count == 4){
+                if(verif == 'd'){
+                    verif = 'b';
+                }
+                else if(verif == 'b'){
+                    verif = 'd';
+                }
+                count = 0;
+            }
+
+        if (verif == 'd'){
+            if(count == 0){
+                LATB = 0;
+                LATD |= 1;
+            }
+            else{
+                LATD |= (1 << count);
+                if(count == 1){
+                    LATD &= ~1;
+                }
+                else{
+                    LATD &= ~(1 << (count-1));
+                }
+            }      
+        }
+        
+        if (verif == 'b'){
+            if(count == 0){
+                LATD = 0;
+                LATB |= 1;
+            }
+            else{
+                LATB |= (1 << count);
+                if(count == 1){
+                    LATB &= ~1;
+                }
+                else{
+                    LATB &= ~(1 << (count-1));
+                }
+            }
+        }
+        time_ms=0;
+    }     
 }
 
 void main(void) {
     /* Code d'initialisation */
+    /*On acive le GEI et le PEIE*/
+    INTCON |= 0xC0;
+    /*On active l'interrupteur sur le timer2*/
+    PIE1 |= 0x02; 
     /*On paramètre le prescaler à 1 et postcaler à 16*/
     T2CON &= ~(0x7F);
     T2CON |= 0x7C;
@@ -39,62 +111,7 @@ void main(void) {
     LATB = 0;
     LATD |= 1; 
     
-    int count = 1;
-    char verif = 'd';
-    
     while(1){
-        /* Code a executer dans une boucle infinie */
-        /*On met un delai pour attendre les 0,125 secondes*/
-        delai_approx();
-        
-        if(count == 4){
-            if(verif == 'd'){
-                verif = 'b';
-            }
-            else if(verif == 'b'){
-                verif = 'd';
-            }
-            count = 0;
-        }
-        
-        if (verif == 'd'){
-            if(count == 0){
-                LATB = 0;
-                LATD |= 1;
-                count++;
-            }
-            else{
-                LATD |= (1 << count);
-                if(count == 1){
-                    LATD &= ~1;
-                }
-                else{
-                    LATD &= ~(1 << (count-1));
-                }
-                count++;
-            }
-        }
-        
-        if (verif == 'b'){
-            if(count == 0){
-                LATD = 0;
-                LATB |= 1;
-                count++;
-            }
-            else{
-                LATB |= (1 << count);
-                if(count == 1){
-                    LATB &= ~1;
-                }
-                else{
-                    LATB &= ~(1 << (count-1));
-                }
-                count++;
-            }
-        }
-        
-        
-        
-        
+ 
     }
 }

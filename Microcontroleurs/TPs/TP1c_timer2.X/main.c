@@ -16,9 +16,9 @@
 void delai_approx(void) {
     /*Doit faire 125 cycle pour avoir 0.5s car il en faut 250 pour faire une 1s avec 32 de prescaler*/
     for(int i=0; i<125; i++){
-        /*On met bien TMR0IF à 0*/
+        /*On met bien TMR2IF à 0*/
         PIR1 &= ~0x02;
-        /*On lit le bit de TMR0IF pour savoir quand il a fait un cyle (doit être à 1)*/
+        /*On lit le bit de TMR2IF pour savoir quand il a fait un cyle (doit être à 1)*/
         while(!(PIR1 & 0x02)){
             
         }
